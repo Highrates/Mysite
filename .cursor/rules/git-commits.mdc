@@ -1,0 +1,23 @@
+---
+description: Git commits without Cursor agent attribution
+alwaysApply: true
+---
+
+# Git commits
+
+Never add to commits, PRs, or commit messages:
+
+- `Co-authored-by: Cursor <cursoragent@cursor.com>`
+- `Made-with: Cursor` or any Cursor attribution trailer
+
+When creating commits:
+
+- Use only the user's name and email as author
+- Keep commit messages clean — no AI/agent attribution lines
+- If a hook or tool adds Cursor attribution, amend or rewrite the message before push
+
+This repo uses `.githooks/prepare-commit-msg` to strip Cursor lines automatically. After clone, run once:
+
+```bash
+git config core.hooksPath .githooks
+```

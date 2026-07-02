@@ -1,0 +1,4 @@
+#!/bin/sh
+# Strip Cursor agent attribution from commit messages.
+tmp=$(mktemp)
+grep -v -E 'cursoragent@cursor\.com|Made-with: Cursor' "$1" > "$tmp" && mv "$tmp" "$1"
