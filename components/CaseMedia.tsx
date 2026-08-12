@@ -2,6 +2,13 @@ import Image from "next/image";
 
 export type CaseMediaCorners = "all" | "top" | "bottom" | "none";
 
+export type CaseMediaVideoInset = {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+};
+
 const cornersClassName: Record<CaseMediaCorners, string> = {
   all: "rounded-2xl",
   top: "rounded-t-2xl",
@@ -14,6 +21,8 @@ type CaseMediaProps = {
   alt: string;
   priority?: boolean;
   corners?: CaseMediaCorners;
+  video?: string;
+  videoInset?: CaseMediaVideoInset;
 };
 
 export function CaseMedia({
@@ -21,17 +30,15 @@ export function CaseMedia({
   alt,
   priority = false,
   corners = "all",
+  video,
+  videoInset,
 }: CaseMediaProps) {
   return (
     <div
-      className={`w-full min-w-0 max-w-full overflow-hidden ${cornersClassName[corners]}`}
+      className={`relative w-full min-w-0 max-w-full overflow-hidden ${cornersClassName[corners]}`}
     >
       {src.endsWith(".gif") ? (
-        <img
-          src={src}
-          alt={alt}
-          className="h-auto w-full max-w-full"
-        />
+        <img src={src} alt={alt} className="h-auto w-full max-w-full" />
       ) : (
         <Image
           src={src}
@@ -43,6 +50,28 @@ export function CaseMedia({
           className="h-auto w-full max-w-full"
         />
       )}
+
+      {video && videoInset ? (
+        <div
+          className="absolute overflow-hidden"
+          style={{
+            top: `${videoInset.top}%`,
+            right: `${videoInset.right}%`,
+            bottom: `${videoInset.bottom}%`,
+            left: `${videoInset.left}%`,
+          }}
+        >
+          <video
+            src={video}
+            className="h-full w-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            aria-label={alt}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

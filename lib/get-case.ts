@@ -1,12 +1,12 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import type { Case, CaseLayout } from "./cases";
+import type { Case, CaseLayout, CaseMediaItem } from "./cases";
 
 export type CaseContent = Case & {
   body: string;
   layout: CaseLayout;
-  media: string[];
+  media: CaseMediaItem[];
 };
 
 type CaseFrontmatter = {
@@ -15,8 +15,9 @@ type CaseFrontmatter = {
   description?: string;
   cover?: string;
   layout?: CaseLayout;
-  media?: string[];
+  media?: CaseMediaItem[];
   order?: number;
+  hidden?: boolean;
 };
 
 type ParsedCase = CaseContent & { order: number };
@@ -42,13 +43,14 @@ function parseCaseFile(filename: string): ParsedCase | null {
     cover: frontmatter.cover,
     layout: frontmatter.layout ?? "default",
     media: frontmatter.media ?? [],
+    hidden: frontmatter.hidden ?? false,
     body: content,
     order: frontmatter.order ?? Number.MAX_SAFE_INTEGER,
   };
 }
 
 function loadAllCases(): CaseContent[] {
-  if (casesCache) {
+  if (process.env.NODE_ENV === "production" && casesCache) {
     return casesCache;
   }
 
@@ -56,13 +58,18 @@ function loadAllCases(): CaseContent[] {
     .readdirSync(casesDirectory)
     .filter((filename) => filename.endsWith(".md"));
 
-  casesCache = files
+  const loaded = files
     .map(parseCaseFile)
     .filter((item): item is ParsedCase => item !== null)
+    .filter((item) => !item.hidden)
     .sort((a, b) => a.order - b.order)
-    .map(({ order: _order, ...item }) => item);
+    .map(({ order: _order, hidden: _hidden, ...item }) => item);
 
-  return casesCache;
+  if (process.env.NODE_ENV === "production") {
+    casesCache = loaded;
+  }
+
+  return loaded;
 }
 
 export function getAllCases(): Case[] {

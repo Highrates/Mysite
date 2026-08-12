@@ -2,6 +2,7 @@
 title: Lalabox
 slug: lalabox
 order: 2
+hidden: true
 layout: gallery
 description: ""
 cover: /images/cases/lalabox.png
